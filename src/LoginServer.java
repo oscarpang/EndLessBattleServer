@@ -176,6 +176,29 @@ class Communicator extends Thread
 								sendObject(Constants.USERNOTFOUND);
 							}
 						}
+						else if(signal.equals(Constants.REGISTER))
+					{
+						obj = ois.readObject();
+						if(obj instanceof LoginInfo)
+						{
+							LoginInfo login = (LoginInfo)obj;
+							System.out.println("Good");
+							
+							MySQLDriver driver = new MySQLDriver();
+							driver.connect();
+							if(driver.doesExist(login.getUsername()))
+							{
+								System.out.println("Exist");
+								sendObject(Constants.USERNAMEOCCUPIED);
+							}
+							else
+							{
+								System.out.println("Not Exist");
+								int hash = LoginServer.hash(login.getPassword());
+								driver.add(login.getUsername, hash);
+
+								sendObject(Constants.REGISTERSUCCESS);
+							}
 					}
 				}
 			
