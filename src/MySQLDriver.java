@@ -8,7 +8,7 @@ import java.sql.*;
 public class MySQLDriver {
 	
 	private Connection con;
-	private final static String selectName = "SELECT * FROM LOGININFO WHERE USERNAME=?";
+	private final static String selectName = "SELECT * FROM LoginInfo WHERE USERNAME=?";
 	private final static String addProduct = "INSERT INTO LOGININFO(USERNAME, USERPASSWORD) VALUES(?,?)";
 //	private final static String updateTable = "UPDATE FACTORYORDERS SET CREATED = ? WHERE NAME = ?";
 	
