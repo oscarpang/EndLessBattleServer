@@ -1,4 +1,4 @@
-import java.io.BufferedReader;
+	import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -14,7 +14,7 @@ public class LoginServer
 
 	public LoginServer()
 	{
-		
+
 		ServerSocket ss = null;
 		try
 		{
@@ -49,42 +49,42 @@ public class LoginServer
 			}
 		}
 	}
-	
+
 	public static int hash(String password)
 	{
 
-			char[] charPass = password.toCharArray();
-			long tran = 0;
+		char[] charPass = password.toCharArray();
+		long tran = 0;
 
-			for(int i = 0; i < password.length(); i++)
-			{
-				// 
-				tran += ((int)charPass[i])* ((long)(Math.pow(128,(password.length()-i-1))));
-				// cout << tran << endl;
-			}
+		for (int i = 0; i < password.length(); i++)
+		{
+			//
+			tran += ((int) charPass[i]) * ((long) (Math.pow(128, (password.length() - i - 1))));
+			// cout << tran << endl;
+		}
 
+		long[] convert = new long[4];
 
-			long[] convert = new long[4];
+		for (int i = 3; i >= 0; i--)
+		{
+			convert[i] = tran % 65521;
+			tran /= 65521;
+			// cout << convert[i] << endl;
+		}
 
-			for(int i = 3; i >=0; i--)
-			{
-				convert[i] = tran%65521;
-				tran/=65521;
-				// cout << convert[i] << endl;
-			}
+		int hashValue = (int) ((45912 * convert[0] + 35511 * convert[1] + 65169 * convert[2] + 4625 * convert[3])
+				% 65521);
 
-			int hashValue = (int)((45912 * convert[0] + 35511 * convert[1]  + 65169 * convert[2] + 4625 * convert[3]) % 65521);
+		// std::cout << hashValue << std::endl;
+		return hashValue;
 
-			// std::cout << hashValue << std::endl;
-			return hashValue;
-		
 	}
 
 	public void removeCommunicator(Communicator comm)
 	{
 		ctVector.remove(comm);
 	}
-	
+
 	public static void main(String[] args)
 	{
 		new LoginServer();
@@ -118,7 +118,7 @@ class Communicator extends Thread
 			System.out.println("IOE in ChatThread constructor: " + ioe.getMessage());
 		}
 	}
-	
+
 	public void sendObject(Object obj)
 	{
 		try
@@ -126,7 +126,7 @@ class Communicator extends Thread
 			oos.writeObject(obj);
 			oos.flush();
 		}
-		catch(IOException ioe)
+		catch (IOException ioe)
 		{
 			ioe.printStackTrace();
 		}
@@ -140,29 +140,29 @@ class Communicator extends Thread
 			while (true)
 			{
 				obj = ois.readObject();
-				if(obj instanceof Signal)
+				if (obj instanceof Signal)
 				{
-					Signal signal = (Signal)obj;
-					if(signal.equals(Constants.LOGIN))
+					Signal signal = (Signal) obj;
+					if (signal.equals(Constants.LOGIN))
 					{
 						obj = ois.readObject();
-						if(obj instanceof LoginInfo)
+						if (obj instanceof LoginInfo)
 						{
-							LoginInfo login = (LoginInfo)obj;
+							LoginInfo login = (LoginInfo) obj;
 							System.out.println("Goood");
-							
+
 							MySQLDriver driver = new MySQLDriver();
 							driver.connect();
-							if(driver.doesExist(login.getUsername()))
+							if (driver.doesExist(login.getUsername()))
 							{
 								System.out.println("Exist");
 								int dbPassword = driver.getPassword(login.getUsername());
 								int hash = LoginServer.hash(login.getPassword());
-								if(dbPassword == hash)
+								if (dbPassword == hash)
 								{
 									System.out.println("Login Successfully");
 									sendObject(Constants.LOGINSUCCESS);
-									
+
 								}
 								else
 								{
@@ -176,32 +176,34 @@ class Communicator extends Thread
 								sendObject(Constants.USERNOTFOUND);
 							}
 						}
-						else if(signal.equals(Constants.REGISTER))
-					{
-						obj = ois.readObject();
-						if(obj instanceof LoginInfo)
+						else if (signal.equals(Constants.REGISTER))
 						{
-							LoginInfo login = (LoginInfo)obj;
-							System.out.println("Good");
-							
-							MySQLDriver driver = new MySQLDriver();
-							driver.connect();
-							if(driver.doesExist(login.getUsername()))
+							obj = ois.readObject();
+							if (obj instanceof LoginInfo)
 							{
-								System.out.println("Exist");
-								sendObject(Constants.USERNAMEOCCUPIED);
-							}
-							else
-							{
-								System.out.println("Not Exist");
-								int hash = LoginServer.hash(login.getPassword());
-								driver.add(login.getUsername, hash);
+								LoginInfo login = (LoginInfo) obj;
+								System.out.println("Good");
 
-								sendObject(Constants.REGISTERSUCCESS);
+								MySQLDriver driver = new MySQLDriver();
+								driver.connect();
+								if (driver.doesExist(login.getUsername()))
+								{
+									System.out.println("Exist");
+									sendObject(Constants.USERNAMEOCCUPIED);
+								}
+								else
+								{
+									System.out.println("Not Exist");
+									int hash = LoginServer.hash(login.getPassword());
+									driver.add(login.getUsername(), hash);
+
+									sendObject(Constants.REGISTERSUCCESS);
+								}
 							}
+						}
+
 					}
 				}
-			
 			}
 		}
 		catch (IOException e)
@@ -214,4 +216,5 @@ class Communicator extends Thread
 			cnfe.printStackTrace();
 		}
 	}
+
 }
