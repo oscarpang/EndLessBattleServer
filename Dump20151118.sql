@@ -20,6 +20,8 @@
 --
 
 CREATE DATABASE  IF NOT EXISTS `EndLessBattle`;
+USE EndLessBattle;
+
 
 DROP TABLE IF EXISTS `LoginInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
